@@ -19,7 +19,7 @@ Dim VBRawCode As String
 'Create a reference to the editor itself, MAKE SURE YOU HAVE MACRO SECURITY TURNED OFF.
 Set VBAEditor = Application.VBE
 
-'Create a reference to the projects in the Visual Basic Editor. This will return my Personal Macro Workbook.
+''Create a reference to the projects in the Visual Basic Editor. This will return my Personal Macro Workbook.
 'Set VBProj = VBAEditor.VBProjects(1)
 Set VBProj = ActiveWorkbook.VBProject
 
@@ -51,7 +51,7 @@ Set xml_obj = New MSXML2.XMLHTTP60
     'Open a new request, specify the method and the URL and make sure it's async.
     xml_obj.Open bstrMethod:="PUT", bstrURL:=full_url, varAsync:=True
     
-    'Set the headers.
+    ''Set the headers.
     xml_obj.setRequestHeader bstrHeader:="Accept", bstrValue:="application/vnd.github.v3+json"
     xml_obj.setRequestHeader bstrHeader:="Authorization", bstrValue:="token " + access_token
 
@@ -108,7 +108,7 @@ End Sub
 
 Function EncodeBase64(text As String) As String
     
-    'Define the variables.
+    ''Define the variables.
     Dim arrData() As Byte
     Dim objXML As MSXML2.DOMDocument60
     Dim objNode As MSXML2.IXMLDOMElement
