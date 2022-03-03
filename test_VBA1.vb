@@ -32,7 +32,7 @@ VBRawCode = VBCodeMod.Lines(StartLine:=1, Count:=VBCodeMod.CountOfLines)
 'Base64 Encode the String.
 RawCodeEncoded = EncodeBase64(text:=VBRawCode)
 
-'Create a reference to the Microsoft XML library
+''Create a reference to the Microsoft XML library
 Set xml_obj = New MSXML2.XMLHTTP60
 
     'Define URL Components
