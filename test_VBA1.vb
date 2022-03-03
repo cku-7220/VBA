@@ -135,4 +135,4 @@ Function EncodeBase64(text As String) As String
 End Function
 
 
-'https://bettersolutions.com/vba/visual-basic-editor/extensibility-sample-code.htm
+
