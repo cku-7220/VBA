@@ -23,7 +23,7 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdImport_Click()
-    'CSV_Import - zmieniamy podejœcie - tworzymy tabelê przejœciow¹ dla plików csv, kór¹ póŸniej modelujemy, usuwaj¹c wartoœci i dodaj¹c kolumny zale¿nie od nazwy pliku (prod, trad), oraz kolumny z datami.
+    'CSV_Import - zmieniamy podejÅ“cie - tworzymy tabelÃª przejÅ“ciowÂ¹ dla plikÃ³w csv, kÃ³rÂ¹ pÃ³Å¸niej modelujemy, usuwajÂ¹c wartoÅ“ci i dodajÂ¹c kolumny zaleÂ¿nie od nazwy pliku (prod, trad), oraz kolumny z datami.
     Dim sSelectQuery As String
     Dim sConnect As String
     Dim mcnSQLServer As ADODB.Connection
@@ -55,13 +55,13 @@ Private Sub cmdImport_Click()
                 ElseIf InStr(1, ListView1.ListItems(bItem).SubItems(1), "PolandTRAD", 1) <> 0 Then
                     sPartName = "PolandTRAD"
                 Else
-                    MsgBox "Podany plik '" & ListView1.ListItems(bItem).SubItems(1) & "' nie zosta³ rozpoznany jako plik Ÿród³owy."
+                    MsgBox "Podany plik '" & ListView1.ListItems(bItem).SubItems(1) & "' nie zostaÂ³ rozpoznany jako plik Å¸rÃ³dÂ³owy."
                     GoTo nextFile
                 End If
                 
                 sTableGUID = GetGUID
 
-' Tworzymy tabelê tymczasow¹ 'FDM_MAPS_Temp'
+' Tworzymy tabelÃª tymczasowÂ¹ 'FDM_MAPS_Temp'
                 sSelectQuery = "CREATE TABLE FDM_MAPS_Temp_" & sTableGUID & " ([Edytuj pozycje noty] VARCHAR(20), " & _
                         "[ColumnName] NVARCHAR(75), " & _
                         "[ColumnName] NVARCHAR(75), " & _
@@ -82,7 +82,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Uzupe³niamy kolumnê tymczasow¹ 'FDM_MAPS_Temp' danymi z pliku .csv
+' UzupeÂ³niamy kolumnÃª tymczasowÂ¹ 'FDM_MAPS_Temp' danymi z pliku .csv
                 sSelectQuery = "BULK INSERT [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "FROM '" & sSourceFile & "' " & _
                         "WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ';', " & _
@@ -92,7 +92,7 @@ Private Sub cmdImport_Click()
                 
 ' Usuwamy niepotrzebne kolumny
                 sSelectQuery = "ALTER TABLE [DB].[dbo].[Table_" & sTableGUID & "] " & _
-                        "DROP COLUMN [Kwota], [Kwota Ÿród³owa], [Edytuj pozycje noty];"
+                        "DROP COLUMN [Kwota], [Kwota Å¸rÃ³dÂ³owa], [Edytuj pozycje noty];"
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
@@ -104,7 +104,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
     
-' Uzupe³niamy dodane kolumny danymi
+' UzupeÂ³niamy dodane kolumny danymi
                 sSelectQuery = "UPDATE [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "Set [PartName]  = '" & sPartName & "', " & _
                         "[PeriodKey] = '" & Format(Me.dtpDateFrom.Text, "YYYY-MM-DD") & "', " & _
@@ -112,7 +112,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Obcinamy [Account] do 6 pierwszych znaków
+' Obcinamy [Account] do 6 pierwszych znakÃ³w
                 sSelectQuery = "Update [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "set [Account] = Left([Account], 6)"
                 'Debug.Print sSelectQuery
@@ -154,7 +154,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Usuwamy tabelê tymczasow¹ 'FDM_MAPS_Temp'
+' Usuwamy tabelÃª tymczasowÂ¹ 'FDM_MAPS_Temp'
                 sSelectQuery = "DROP TABLE [DB].[dbo].[Table_" & sTableGUID & "];"
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
@@ -163,13 +163,13 @@ nextFile:
         Next bItem
     End With
     
-    MsgBox "Operacja zakoñczona powodzeniem."
+    MsgBox "Operacja zakoÃ±czona powodzeniem."
 
     End
 
 error:
     
-    MsgBox "Operacja zakoñczona niepowodzeniem."
+    MsgBox "Operacja zakoÃ±czona niepowodzeniem."
     sSelectQuery = "DROP TABLE [DB].[dbo].[Table_" & sTableGUID & "]; "
     'Debug.Print sSelectQuery
     mcnSQLServer.Execute (sSelectQuery)
@@ -196,7 +196,7 @@ End Sub
 
 Private Sub txtPath_DropButtonClick()
     With Application.FileDialog(msoFileDialogFolderPicker)
-        .Title = "Wybierz folder z plikami Ÿród³owymi"
+        .Title = "Wybierz folder z plikami Å¸rÃ³dÂ³owymi"
         .Filters.Clear
         '.Filters.Add ".CSV", "*.CSV", 1
         .AllowMultiSelect = False
@@ -220,13 +220,13 @@ Private Sub UserForm_Initialize()
         .Height = 258
         .Width = 375.75
         .Caption = "FDMEE"
-        .Frame1.Caption = "Opcje importu plików FDMEE"
+        .Frame1.Caption = "Opcje importu plikÃ³w FDMEE"
         .cmdClose.Caption = "Zamknij"
         .cmdClose.Visible = True
         .cmdImport.Caption = "Importuj"
         .cmdImport.Visible = True
         .cmdImport.SetFocus
-        .lblPath.Caption = "Wybierz folder plików Ÿród³owych"
+        .lblPath.Caption = "Wybierz folder plikÃ³w Å¸rÃ³dÂ³owych"
         .lblLV.Caption = "Wybierz plik"
         With .txtPath
             .Text = FilePathString_Get(gsREG_FOLDER_FULL_PATH_SOURCE)
@@ -334,3 +334,241 @@ Private Function GetGUID() As String
     Next N
     GetGUID = GUID
 End Function
+
+Sub AllCCDownload(ByVal gsCAP_REPORT_TITLE As String, ByVal gbStatus As Boolean)
+    Dim sQuery                              As String
+    Dim iError                              As Integer
+    Dim i                                   As Long
+    Dim lItem                               As Long
+    Dim lRowOffset                          As Long
+    Dim rngStartCell                        As Range
+    Dim lColumnOffset                       As Long
+    Dim sLi                                 As Object
+    Dim sCommand                            As String
+    Dim lRow                                As Long
+    Dim rsCCList                            As ADODB.Recordset
+    
+    Application.ScreenUpdating = False
+
+    On Error GoTo ErrHandler
+    
+    If gbMSG_RUAdd = True Then
+        Exit Sub
+    End If
+    
+    With fMapping.ListView2.ListItems
+        If Not .Count = 0 Then
+            .Clear
+        End If
+    End With
+    
+    If gsCAP_REPORT_TITLE = gsCAP_REPORT_TITLE_SK Then
+    
+        If gbStatus = True Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry"
+                
+        ElseIf gbStatus = False Then
+            If gsCAP_REPORT_TITLE_Level_2 = gsCAP_REPORT_TITLE_SKwoJO Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry"
+                
+            ElseIf gsCAP_REPORT_TITLE_Level_2 = "" Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry" & _
+                    IIf(Len(fMapping.txtNumber1.Value) = 0, "", " AND [CC].[ColumnName] LIKE '" & fMapping.txtNumber1.Value & "' ") & _
+                    IIf(Len(fMapping.txtDesc1.Value) = 0, "", " AND [CC].[ColumnName] LIKE '" & fMapping.txtDesc1.Value & "' ") & _
+                    IIf(Len(fMapping.txtNumber2.Value) = 0, "", " AND [CRC].[ColumnName] LIKE '" & fMapping.txtNumber2.Value & "' ") & _
+                    IIf(Len(fMapping.txtDesc2.Value) = 0, "", " AND [CRC].[ColumnName] LIKE '" & fMapping.txtDesc2.Value & "' ") & _
+                    IIf(Len(fMapping.txtNumber3.Value) = 0, "", " AND [CRC].[ColumnName] LIKE '" & fMapping.txtNumber3.Value & "' ") & _
+                    IIf(Len(fMapping.txtDesc3.Value) = 0, "", " AND [CRC].[ColumnName] LIKE '" & fMapping.txtDesc3.Value & "' ") & _
+                    IIf(Len(fMapping.txtEGCode.Value) = 0, "", " AND [CS].[ColumnName] LIKE '" & fMapping.txtEGCode.Value & "' ") & _
+                    IIf(Len(fMapping.txtCrop.Value) = 0, "", " AND [CRC].[ColumnName] LIKE '" & fMapping.txtCrop.Value & "' ") & _
+                    IIf(fMapping.cbMap.Text = "Wszystkie", "", IIf(fMapping.cbMap.Text = "Niezmapowane", "AND [CRC].[ColumnName] IS NULL", "AND [CRC].[ColumnName] IS NOT NULL")) & _
+                    " ORDER BY [CC].[ColumnName] "
+            End If
+
+        End If
+    ElseIf gsCAP_REPORT_TITLE = gsCAP_REPORT_TITLE_RC Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry" & _
+            IIf(Len(fMapping.txtNumber1.Value) = 0, "", " AND [RC].[ColumnName] LIKE '" & fMapping.txtNumber1.Value & "' ") & _
+            IIf(Len(fMapping.txtDesc1.Value) = 0, "", " AND [RC].[ColumnName] LIKE '" & fMapping.txtDesc1.Value & "' ") & _
+            IIf(Len(fMapping.txtEGCode.Value) = 0, "", " AND [CS].[ColumnName] LIKE '" & fMapping.txtEGCode.Value & "' ") & _
+            " ORDER BY [ColumnName] "
+    ElseIf gsCAP_REPORT_TITLE = gsCAP_REPORT_TITLE_RU Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry" & _
+            IIf(Len(fMapping.txtNumber1.Value) = 0, "", " AND [RU].[ColumnName] LIKE '" & fMapping.txtNumber1.Value & "' ") & _
+            IIf(Len(fMapping.txtDesc1.Value) = 0, "", " AND [RU].[ColumnName] LIKE '" & fMapping.txtDesc1.Value & "' ") & _
+            IIf(Len(fMapping.txtNumber2.Value) = 0, "", " AND [RU].[ColumnName] LIKE '" & fMapping.txtNumber2.Value & "' ") & _
+            IIf(Len(fMapping.txtDesc2.Value) = 0, "", " AND [RU].[ColumnName] LIKE '" & fMapping.txtDesc2.Value & "' ") & _
+            IIf(Len(fMapping.txtEGCode.Value) = 0, "", " AND [CS].[ColumnName] LIKE '" & fMapping.txtEGCode.Value & "' ") & _
+            IIf(Len(fMapping.txtCrop.Value) = 0, "", " AND [RU].[ColumnName] LIKE '" & fMapping.txtCrop.Value & "' ")
+    ElseIf gsCAP_REPORT_TITLE = gsCAP_REPORT_TITLE_SKwoJO Then
+            sQuery = "Querry " & _
+                "Querry " & _
+                "Querry " & _
+                "Querry"
+
+    End If
+
+
+    If sQuery <> "" Then
+        Set mcnSQLServer = New ADODB.Connection
+        mcnSQLServer.CursorLocation = adUseClient
+        mcnSQLServer.ConnectionString = gsCONNECTION_STRING_ODYSSEY
+        mcnSQLServer.Open
+        Set rsCCList = New ADODB.Recordset
+        rsCCList.Open sQuery, mcnSQLServer, adOpenDynamic, adLockOptimistic
+
+        With fMapping.ListView2
+            .AllowColumnReorder = False
+            .CheckBoxes = True
+            .FullRowSelect = True
+            .MultiSelect = False
+            .View = 3
+            .Gridlines = True
+            With .ListItems
+                
+            End With
+            With .ColumnHeaders
+                .Clear
+                .Add Text:="  ", Width:=20
+                For lItem = 1 To rsCCList.Fields.Count
+                    If lItem < rsCCList.Fields.Count Then
+                        .Add , , rsCCList.Fields(lItem - 1).name, Width:=130
+                    ElseIf lItem = rsCCList.Fields.Count Then
+                        .Add , , rsCCList.Fields(lItem - 1).name, Width:=5
+                    End If
+                Next lItem
+            End With
+            
+            With rsCCList
+                If .BOF And .EOF Then
+                    MsgBox "ZbiÃ³r jest pusty."
+                    Exit Sub
+                End If
+            End With
+            
+            lRowOffset = 0
+            lColumnOffset = rsCCList.Fields.Count
+    
+            rsCCList.MoveFirst
+            With rngStartCell
+                While Not rsCCList.EOF
+                    ReDim arr(CLng(rsCCList.RecordCount), lColumnOffset)
+                    For lItem = 0 To lColumnOffset - 1
+                        If lItem = 0 Then
+                            Set sLi = fMapping.ListView2.ListItems.Add()
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , "-"
+                                arr(lRowOffset, lItem) = "-"
+                            Else
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            End If
+                            GoTo next_iteration
+                        End If
+                        
+                        Select Case rsCCList.Fields(lItem).Type
+                        Case 1
+                            ' SQL char type
+                            sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                            arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                        Case 2
+                            ' SQL int type
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            Else
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            End If
+                        Case 3
+                            ' SQL float type
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , "-"
+                                arr(lRowOffset, lItem) = "-"
+                            Else
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            End If
+                        Case 6
+                            ' SQL image type
+                            sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                            arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                        Case 7
+                            ' SQL bit type
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            Else
+                                sLi.ListSubItems.Add , , CInt(rsCCList.Fields(lItem).Value)
+                                arr(lRowOffset, lItem) = CInt(rsCCList.Fields(lItem).Value)
+                            End If
+                        Case 9
+                            ' SQL Date/time
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , "-"
+                                arr(lRowOffset, lItem) = "-"
+                            Else
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            End If
+                        Case 10
+                            ' SQL uniqueidentifier type
+                            sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                            arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                        Case Else
+                            ' Other
+                            If IsNull(rsCCList.Fields(lItem).Value) Then
+                                sLi.ListSubItems.Add , , "-"
+                                arr(lRowOffset, lItem) = "-"
+                            Else
+                                sLi.ListSubItems.Add , , rsCCList.Fields(lItem).Value
+                                arr(lRowOffset, lItem) = rsCCList.Fields(lItem).Value
+                            End If
+                        End Select
+next_iteration:
+                    Next lItem
+                    If lRowOffset = 1000 Then GoTo SubExit
+                    lRowOffset = lRowOffset + 1
+                    rsCCList.MoveNext
+                Wend
+            End With
+        End With
+               
+SubExit:
+        On Error Resume Next
+        rsCCList.MoveFirst
+        If Not rsCCList.EOF Then
+            fMapping.TextBox1.Visible = False
+            fMapping.ListView2.Visible = True
+            gbStatus = False
+
+        End If
+    End If
+        Application.ScreenUpdating = True
+    Exit Sub
+    
+ErrHandler:
+    On Error Resume Next
+    Debug.Print Err.Description
+    fMapping.TextBox2.Visible = True
+    fMapping.ListView2.Visible = False
+    fMapping.TextBox2.MultiLine = True
+    fMapping.lblResult.Caption = "WystÄ…piÅ‚ bÅ‚Ä…d"
+    fMapping.TextBox2.Value = Err.Description & " w " & Err.Source & " o numerze " & Err.Number & "."
+    Resume SubExit
+End Sub
