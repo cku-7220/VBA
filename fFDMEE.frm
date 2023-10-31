@@ -23,7 +23,7 @@ Private Sub cmdClose_Click()
 End Sub
 
 Private Sub cmdImport_Click()
-    'CSV_Import - zmieniamy podejœcie - tworzymy tabelê przejœciow¹ dla plików csv, kór¹ póŸniej modelujemy, usuwaj¹c wartoœci i dodaj¹c kolumny zale¿nie od nazwy pliku (prod, trad), oraz kolumny z datami.
+    
     Dim sSelectQuery As String
     Dim sConnect As String
     Dim mcnSQLServer As ADODB.Connection
@@ -61,7 +61,7 @@ Private Sub cmdImport_Click()
                 
                 sTableGUID = GetGUID
 
-' Tworzymy tabelê tymczasow¹ 'FDM_MAPS_Temp'
+
                 sSelectQuery = "CREATE TABLE FDM_MAPS_Temp_" & sTableGUID & " ([Edytuj pozycje noty] VARCHAR(20), " & _
                         "[ColumnName] NVARCHAR(75), " & _
                         "[ColumnName] NVARCHAR(75), " & _
@@ -82,7 +82,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Uzupe³niamy kolumnê tymczasow¹ 'FDM_MAPS_Temp' danymi z pliku .csv
+' Uzupelniamy kolumny tymczasowe 'Table' danymi z pliku .csv
                 sSelectQuery = "BULK INSERT [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "FROM '" & sSourceFile & "' " & _
                         "WITH (FORMAT = 'CSV', FIRSTROW = 2, FIELDTERMINATOR = ';', " & _
@@ -104,7 +104,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
     
-' Uzupe³niamy dodane kolumny danymi
+' Uzupelniamy dodane kolumny danymi
                 sSelectQuery = "UPDATE [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "Set [PartName]  = '" & sPartName & "', " & _
                         "[PeriodKey] = '" & Format(Me.dtpDateFrom.Text, "YYYY-MM-DD") & "', " & _
@@ -118,13 +118,13 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Zmieniamy rozmiar kolumny [Account] z 75 na 6 - zgodne z FDM_Maps
+' Zmieniamy rozmiar kolumny [Account] z 75 na 6 - zgodne z 'Table'
                 sSelectQuery = "ALTER TABLE [DB].[dbo].[Table_" & sTableGUID & "] " & _
                         "ALTER COLUMN [Account] NVARCHAR(6)"
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Kopiujemy do tabeli FDM_Maps
+' Kopiujemy do tabeli 'Table'
 
             'Remove mappings in [dbo].[FDM_Maps] for newly imported PartNames and PeriodKeys
                 sSelectQuery = "DELETE [DB].[dbo].[Table] FROM [DB].[dbo].[Table] AS CT INNER JOIN [DB].[dbo].[Table_Temp_" & sTableGUID & "] AS UP ON [CT].[ColumnName] = [UP].[ColumnName] AND [CT].[PeriodKey] = [UP].[PeriodKey] AND [UP].[UD1] NOT LIKE '%QTY';"
@@ -154,7 +154,7 @@ Private Sub cmdImport_Click()
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
                 
-' Usuwamy tabelê tymczasow¹ 'FDM_MAPS_Temp'
+' Usuwamy tabele tymczasowa 'Table_Temp'
                 sSelectQuery = "DROP TABLE [DB].[dbo].[Table_" & sTableGUID & "];"
                 'Debug.Print sSelectQuery
                 mcnSQLServer.Execute (sSelectQuery)
