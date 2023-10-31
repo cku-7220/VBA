@@ -50,10 +50,10 @@ Private Sub cmdImport_Click()
             If ListView1.ListItems(bItem).Checked = True Then
                 sSourceFile = Me.txtPath.Text & "\" & ListView1.ListItems(bItem).SubItems(1)
                 
-                If InStr(1, ListView1.ListItems(bItem).SubItems(1), "PolandPROD", 1) <> 0 Then
-                    sPartName = "PolandPROD"
-                ElseIf InStr(1, ListView1.ListItems(bItem).SubItems(1), "PolandTRAD", 1) <> 0 Then
-                    sPartName = "PolandTRAD"
+                If InStr(1, ListView1.ListItems(bItem).SubItems(1), "A", 1) <> 0 Then
+                    sPartName = "A"
+                ElseIf InStr(1, ListView1.ListItems(bItem).SubItems(1), "B", 1) <> 0 Then
+                    sPartName = "B"
                 Else
                     MsgBox "Podany plik '" & ListView1.ListItems(bItem).SubItems(1) & "' nie zosta³ rozpoznany jako plik Ÿród³owy."
                     GoTo nextFile
