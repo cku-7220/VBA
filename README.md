@@ -1,4 +1,2 @@
 # VBA
-VBA1
-test1
-test2
+Repository for VBA Code
