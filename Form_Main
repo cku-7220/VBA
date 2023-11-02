@@ -1,0 +1,26 @@
+Option Compare Database
+
+
+Private Sub btn_close_Click()
+    DoCmd.Close ObjectType:=acForm, ObjectName:=Me.Name, Save:=acSavePrompt
+End Sub
+
+Private Sub btn_DailyMenu_Click()
+    DoCmd.OpenForm "MenuDzienne"
+    DoCmd.Close ObjectType:=acForm, ObjectName:=Me.Name, Save:=acSavePrompt
+End Sub
+
+Private Sub btn_persons_Click()
+    DoCmd.OpenForm "osoby"
+    DoCmd.Close ObjectType:=acForm, ObjectName:=Me.Name, Save:=acSavePrompt
+End Sub
+
+Private Sub btn_products_Click()
+    DoCmd.OpenForm "produkty"
+    DoCmd.Close ObjectType:=acForm, ObjectName:=Me.Name, Save:=acSavePrompt
+End Sub
+
+Private Sub btn_recipes_Click()
+    DoCmd.OpenForm "przepisy"
+    DoCmd.Close ObjectType:=acForm, ObjectName:=Me.Name, Save:=acSavePrompt
+End Sub
