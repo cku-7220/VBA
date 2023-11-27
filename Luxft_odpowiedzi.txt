@@ -1,0 +1,431 @@
+A.
+MsAccess working 2 Year as a one of tools in CreditSuisseand TopFarms alongside with VBA and SQL.
+
+B.
+1 - Access VBA Class modules  
+4 - Access SQL
+4 - Access Forms
+4 - Access Reports
+4 - Automation, from Access, of Excel, Word, Outlook
+4 - Use of other COM objects as required
+4 - Experience of ODBC connections to( SQL Server, Oracle, IBM iSeries)
+
+C.
+
+1)
+
+3 Environments - 3 tables in MsAccess:
+	1: tblDeveloper
+	2: tblAcceptance
+	3: tblLive
+
+Step1.
+Maker  has obli access to UserForm1.
+Maker uses a UserForm1 to enter data to tblDeveloper.
+(We may use data validation in UserForm1's controls)
+After Data is entered, he clicks a button "Deploy" on UserForm1.
+Data are beeing copied from tblDeveloper to tblAcceptance and deleted from tblDeveloper.
+Step ends with data only in tblAcceptance.
+
+Step2.
+Checker usues UserForm2 backloaded with data from tblAcepptance.
+	a) If Checker does not approve the data, he enters comments, and clicks on 'Deny' button.
+	The data are copied to tblDeveloper with comments, and deleted from tblAcceptance.
+	The Developer may enter corrections and redeploy the data to Checker.
+
+	b) If Checker approves data, he clicks on 'Approve' button.
+	The data are copied to table tblDeveloper and tblLive.
+	The developer has data in his table and can start work.
+
+
+
+
+2)
+Assuming the source files are called:
+- File_1
+- File_2
+- File_3
+
+Option Explicit
+
+' **************************************************************
+' Global Constant Declarations
+' **************************************************************
+Public Const gsERR_LEAD_INFO            As String = "An error occured: "
+Public Const gsAPP_NAME                 As String = "Solution_2"
+
+Sub Start()
+
+Const sSource                           As String = "Start()"
+Dim sFolderName                         As String
+
+    On Error GoTo ErrHandler
+
+    With Application
+        .ScreenUpdating = False
+        .Calculation = xlCalculationManual
+        .DisplayAlerts = False
+        .EnableEvents = False
+        .EnableAnimations = False
+    End With
+    
+    '1
+    SelectFolder sFolderName
+    
+    '2
+    CreateReportWorkbook sFolderName
+    
+    With Application
+        .ScreenUpdating = True
+        .Calculation = xlCalculationAutomatic
+        .DisplayAlerts = True
+        .EnableEvents = True
+        .EnableAnimations = True
+    End With
+    
+ErrorExit:
+
+    On Error Resume Next
+    Exit Sub
+
+ErrHandler:
+    
+    MsgBox gsERR_LEAD_INFO & " (" & sSource & ") " & Err.Number & " - " & Err.Description & ".", vbCritical + vbOKOnly, gsAPP_NAME
+    Resume ErrorExit
+
+End Sub
+
+Sub SelectFolder(ByRef sFolderName As String)
+
+Const sSource                           As String = "SelectFolder()"
+
+    On Error GoTo ErrHandler
+
+    ' Open the select folder prompt
+    With Application.FileDialog(msoFileDialogFolderPicker)
+        If .Show = -1 Then ' if OK is pressed
+            sFolderName = .SelectedItems(1)
+        Else
+            MsgBox ("Operation cancelled.")
+            End
+        End If
+    End With
+
+ErrorExit:
+
+    On Error Resume Next
+    Exit Sub
+
+ErrHandler:
+    
+    MsgBox gsERR_LEAD_INFO & " (" & sSource & ") " & Err.Number & " - " & Err.Description & ".", vbCritical + vbOKOnly, gsAPP_NAME
+    Resume ErrorExit
+    
+End Sub
+
+Sub CreateReportWorkbook(ByVal sFolderName As String)
+
+Const sSource                           As String = "CreateReportWorkbok()"
+Dim appExcel                            As Excel.Application
+Dim wkbReportWorkbook                   As Excel.Workbook
+Dim sFileName                           As String
+
+    On Error GoTo ErrHandler
+    
+    'Early binding
+    Set appExcel = New Excel.Application
+    
+    With appExcel
+        .Visible = False
+        .ScreenUpdating = False
+        .DisplayAlerts = False
+        .EnableEvents = False
+        .EnableAnimations = False
+    End With
+    
+    Set wkbReportWorkbook = appExcel.Workbooks.Add
+    
+    sFileName = sFolderName & "\" & "File_4_" & Format(Now(), "hhMM") 'filename with hour format to avoid overwriting a file
+    wkbReportWorkbook.SaveAs fileName:=sFileName, FileFormat:=51, AddToMru:=False
+    
+    LoopAllFilesInAFolder sFolderName, wkbReportWorkbook
+    
+ErrorExit:
+
+    On Error Resume Next
+    
+    'Cleaning after the Excel.Application, and Excel.Workbook
+    DoEvents
+    wkbReportWorkbook.Parent.Calculation = xlCalculationAutomatic
+    wkbReportWorkbook.ForceFullCalculation = True
+    wkbReportWorkbook.Close SaveChanges:=True
+    Set wkbReportWorkbook = Nothing
+    
+    If Not appExcel Is Nothing Then
+        appExcel.Quit
+        Set appExcel = Nothing
+    End If
+
+    Exit Sub
+    
+ErrHandler:
+    
+    MsgBox gsERR_LEAD_INFO & " (" & sSource & ") " & Err.Number & " - " & Err.Description & ".", vbCritical + vbOKOnly, gsAPP_NAME
+    Resume ErrorExit
+    
+End Sub
+
+Sub LoopAllFilesInAFolder(ByVal sFolderName As String, ByRef wkbReportWorkbook As Excel.Workbook)
+
+Const sSource                           As String = "LoopAllFilesInAFolder()"
+Dim oFSOLibrary                         As Object
+Dim oFSOFolder                          As Object
+Dim oFSOFile                            As Object
+
+    On Error GoTo ErrHandler
+
+    If sFolderName <> "" Then ' if a folder was chosen
+
+        'Set all the references to the FSO Library - late binding
+        Set oFSOLibrary = CreateObject("Scripting.FileSystemObject")
+        Set oFSOFolder = oFSOLibrary.GetFolder(sFolderName)
+        
+        'For Each loop to loop through each file in the folder and choose only those, which match the condition
+        For Each oFSOFile In oFSOFolder.Files
+            If InStr(1, oFSOFile.Name, "File_1", 1) Or InStr(1, oFSOFile.Name, "File_2", 1) Or InStr(1, oFSOFile.Name, "File_3", 1) Then
+                RecordsetToReport oFSOFile.Name, sFolderName, wkbReportWorkbook
+            End If
+        Next
+
+    End If
+
+ErrorExit:
+
+    On Error Resume Next
+    
+    Set oFSOLibrary = Nothing
+    Set oFSOFolder = Nothing
+    Set oFSOFile = Nothing
+    
+    Exit Sub
+    
+ErrHandler:
+
+    MsgBox gsERR_LEAD_INFO & " (" & sSource & ") " & Err.Number & " - " & Err.Description & ".", vbCritical + vbOKOnly, gsAPP_NAME
+    Resume ErrorExit
+
+End Sub
+
+Sub RecordsetToReport(ByVal sFileName As String, ByVal sFolderName As String, ByRef wkbReportWorkbook As Excel.Workbook)
+
+Const sSource                           As String = "RecordsetToReport()"
+Dim cn                                  As ADODB.Connection
+Dim rs                                  As ADODB.Recordset
+Dim sSQL                                As String
+Dim rng                                 As Range
+Dim iItem                               As Integer
+Dim iLc                                 As Integer
+
+    On Error GoTo ErrHandler
+
+    Set cn = New ADODB.Connection
+    
+    cn.ConnectionString = _
+        "Provider=Microsoft.ACE.OLEDB.12.0;" & _
+        "Data Source=" & sFolderName & "\" & sFileName & ";" & _
+        "Extended Properties='Excel 12.0 Xml;HDR=YES';"
+    cn.Open
+    
+    'Select case to check which file is currently processed
+    Select Case True
+        Case InStr(1, sFileName, "1", 1)
+            sSQL = "SELECT [Page],[Line],[CustomerNo],[CustomerName] FROM [Sheet1$]"
+
+        Case InStr(1, sFileName, "2", 1)
+            sSQL = "SELECT [AccountNumber],[CCY] FROM [Sheet1$]"
+            
+        Case InStr(1, sFileName, "3", 1)
+            sSQL = "SELECT [ValueDate],[TransactionAmount] FROM [Sheet1$]"
+            
+    End Select
+    
+    Set rs = New ADODB.Recordset
+    
+    rs.ActiveConnection = cn
+    rs.Source = sSQL
+    rs.Open
+
+
+    If rs.RecordCount = 0 Then
+        MsgBox "There are no records in file " & sFileName
+        Exit Sub
+    End If
+    
+    rs.MoveFirst
+    
+    'dynamically assigned currently processed range
+    iLc = wkbReportWorkbook.Sheets("Sheet1").Cells(1, wkbReportWorkbook.Sheets("Sheet1").Columns.Count).End(xlToLeft).Column
+    If iLc <> 1 Then iLc = iLc + 1
+    Set rng = wkbReportWorkbook.Sheets("Sheet1").Cells(2, iLc)
+    
+    'write recordset to dynamic range
+    rng.CopyFromRecordset rs
+    
+    'writing fitting columns and writing their names
+    For iItem = 0 To rs.Fields.Count - 1
+        rng.Offset(-1, iItem) = rs.Fields(iItem).Name
+        wkbReportWorkbook.Sheets("Sheet1").Columns.AutoFit
+    Next iItem
+    
+ErrorExit:
+
+    On Error Resume Next
+    
+    rs.Close
+    cn.Close
+    
+    Exit Sub
+    
+ErrHandler:
+
+    MsgBox gsERR_LEAD_INFO & " (" & sSource & ") " & Err.Number & " - " & Err.Description & ".", vbCritical + vbOKOnly, gsAPP_NAME
+    Resume ErrorExit
+    
+End Sub
+
+
+
+
+
+
+
+
+3)
+Sub Round()
+
+    On Error GoTo Errhandler
+    
+    Dim Number As Double
+    Dim DecPlaces As Double
+    Dim result As Double
+
+    Number = InputBox("Input rounded number here", "MyInputTitle", "Enter your input text HERE")
+    DecPlaces = InputBox("How any decimal palces?", "MyInputTitle", "Enter your input text HERE")
+
+    result = fnDmwSymArithRound(Number, DecPlaces)
+
+    MsgBox (result)
+
+    Exit Sub
+
+Errhandler:
+    MsgBox ("There was an error. Application ceassed to work.")
+    Exit Sub
+    
+End Sub
+
+
+Function fnDmwSymArithRound(ByVal Number As Double, ByVal DecPlaces As Double) As Double
+
+    On Error GoTo Errhandler
+
+    Dim dbl As Double
+    
+    dbl = CDec(Nz(Number))
+    
+    
+    dbl = CDec(dbl * 10 ^ DecPlaces)
+    
+    fnDmwSymArithRound = Fix(dbl + 0.5 * Sgn(Number)) / 10 ^ DecPlaces
+    Exit Function
+
+Errhandler:
+    MsgBox ("There was an error. Application ceassed to work.")
+    Exit Function
+    
+End Function
+
+
+
+
+
+4)
+mClass
+Option Explicit
+
+Sub main()
+    Dim account As New clsAccount
+    
+    Call account.CalculateInterest
+    Call account.Credit(100)
+    Call account.Debit(25)
+    
+    Debug.Print account.Interest
+    Debug.Print account.Balance
+    
+End Sub
+
+
+clsAccount
+Option Explicit
+
+Private m_balance           As Currency
+Private m_fees              As Double
+Private dStartDate          As Date
+Private dEndDate            As Date
+Private cPrincipleAmount    As Currency
+Private sCurrency           As String
+Private dCentralBankRate    As Double
+Private dOurBankMargin      As Double
+Private iDays               As Integer
+Private m_Interest          As Double
+Private iDecPlaces          As Integer
+
+Public Property Get Balance() As Currency
+    Balance = m_balance
+End Property
+
+Public Property Get Interest() As Double
+    Interest = m_Interest
+End Property
+
+Sub Credit(Amount As Currency)
+    m_balance = (m_balance + Amount) - (Amount * Interest)
+End Sub
+
+Sub Debit(Amount As Currency)
+    m_balance = (m_balance - Amount) - (Amount * Interest)
+End Sub
+
+Sub CalculateInterest()
+    m_Interest = Round(m_balance * DateDiff("d", dStartDate, dEndDate, vbMonday) * (dCentralBankRate + dOurBankMargin) / 100 * 1 / iDays)
+End Sub
+
+Function Round(ByRef m_Interest As Double)
+        Select Case sCurrency
+        Case "GBP"
+            iDecPlaces = 2
+        Case "PLN"
+            iDecPlaces = 2
+        Case "BHD"
+            iDecPlaces = 3
+        Case Else
+            iDecPlaces = 2
+    End Select
+    
+    Round = Fix(CDec(CDec(m_Interest) * 10 ^ iDecPlaces) + 0.5 * Sgn(m_Interest)) / 10 ^ iDecPlaces
+End Function
+
+Private Sub Class_Initialize()
+    dStartDate = "01.10.2023"
+    dEndDate = "06.10.2023"
+    m_balance = 2000
+    sCurrency = "GBP"
+    dCentralBankRate = 6
+    dOurBankMargin = 6
+    iDays = 365
+End Sub
+
+Private Sub Class_Terminate()
+
+End Sub
